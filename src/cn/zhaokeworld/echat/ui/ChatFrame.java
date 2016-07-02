@@ -5,6 +5,10 @@ import javax.swing.JPanel;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Document;
+import javax.swing.text.PlainDocument;
 
 import cn.zhaokeworld.echat.main.ChatUDPServer;
 import cn.zhaokeworld.echat.main.ChatUDPServer.ReceiveMsg;
@@ -24,7 +28,7 @@ public class ChatFrame extends JFrame implements ReceiveMsg{
 		setSize(500, 500);
 		setTitle("聊天");
 		
-		ChatUDPServer me = new ChatUDPServer(9999);
+		ChatUDPServer me = new ChatUDPServer(9998);
 		me.setReceive(this);
 		Thread t2 = new Thread(me);
 		t2.start();
@@ -34,6 +38,8 @@ public class ChatFrame extends JFrame implements ReceiveMsg{
 		contentPane.setLayout(null);
 		
 		textPane = new JTextPane();
+		Document doc = new DefaultStyledDocument();
+		textPane.setDocument(doc);
 		textPane.setEditable(false);
 		
 		JScrollPane scrollPane = new JScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -57,7 +63,7 @@ public class ChatFrame extends JFrame implements ReceiveMsg{
 				if(textArea.getText()==""||textArea.getText()==null)
 					return;
 				System.out.println(textArea.getText());
-				me.sendMsg(textArea.getText(), 9998);
+				me.sendMsg(textArea.getText(), 9999);
 				StringBuilder sb = new StringBuilder();
 				sb.append(textPane.getText());
 				sb.append("我:\n\t"+textArea.getText()+"\n");
@@ -83,10 +89,16 @@ public class ChatFrame extends JFrame implements ReceiveMsg{
 	@Override
 	public void showMsg(String str) {
 		// TODO Auto-generated method stub
-		StringBuilder sb = new StringBuilder();
-		sb.append(textPane.getText());
-		sb.append(str);
-		textPane.setText(sb.toString());
-		
+//		StringBuilder sb = new StringBuilder();
+//		sb.append(textPane.getText());
+//		sb.append(str);
+//		textPane.setText(sb.toString());
+		Document doc = textPane.getDocument();
+		try {
+			doc.insertString(doc.getLength(), str, null);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
